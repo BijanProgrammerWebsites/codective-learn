@@ -1,0 +1,10 @@
+.layout {
+  display: grid;
+  grid-template-rows: auto 1fr auto;
+  gap: 2rem;
+
+  min-block-size: 100dvh;
+  inline-size: min(75rem, 100%);
+
+  margin-inline: auto;
+}

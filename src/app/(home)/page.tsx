@@ -4,7 +4,7 @@ import { ReactNode } from "react";
 
 import Image from "next/image";
 
-import { Card, List, Typography } from "antd";
+import { Card, List } from "antd";
 
 import styles from "./page.module.css";
 
@@ -30,7 +30,6 @@ export default function Page(): ReactNode {
 
   return (
     <div className={styles.page}>
-      <Typography.Title>Codective Learn</Typography.Title>
       <div className={styles.quizzes}>
         <Card title="Quiz 1">
           <List
