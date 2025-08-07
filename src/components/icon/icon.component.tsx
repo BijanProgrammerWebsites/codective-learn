@@ -1,15 +1,15 @@
 import { ReactElement } from "react";
 
-import { Icon, IconProps } from "@iconify/react";
-
 import clsx from "clsx";
+
+import { Icon, IconifyIconProps } from "@iconify-icon/react";
 
 import { useIconHook } from "@/components/icon/hooks/use-icon.hook";
 import { IconCollection } from "@/components/icon/types/icon-collection.type";
 
 import styles from "./icon.module.css";
 
-type Props = Omit<IconProps, "icon" | "ssr" | "color"> & {
+type Props = Omit<IconifyIconProps, "ref" | "icon" | "ssr" | "color"> & {
   collection?: IconCollection;
   name: string;
 };
@@ -38,7 +38,6 @@ export default function IconComponent({
 
   return (
     <Icon
-      ssr
       icon={iconData}
       className={clsx(styles.icon, className)}
       inline={inline}
