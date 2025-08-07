@@ -11,13 +11,19 @@
   "dependencies": {
     "@ant-design/nextjs-registry": "^1.1.0",
     "@ant-design/v5-patch-for-react-19": "^1.0.3",
+    "@iconify/utils": "^3.0.0",
     "antd": "^5.26.7",
+    "clsx": "^2.1.1",
     "next": "15.4.6",
     "react": "19.1.0",
     "react-dom": "19.1.0"
   },
   "devDependencies": {
     "@eslint/eslintrc": "^3",
+    "@iconify-icon/react": "^3.0.0",
+    "@iconify-json/devicon": "^1.2.36",
+    "@iconify-json/mingcute": "^1.2.3",
+    "@iconify/react": "^6.0.0",
     "@trivago/prettier-plugin-sort-imports": "^5.2.2",
     "@types/node": "^20",
     "@types/react": "^19",
