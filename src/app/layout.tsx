@@ -2,6 +2,8 @@ import { PropsWithChildren, ReactNode } from "react";
 
 import type { Metadata } from "next";
 
+import AntdProvider from "@/providers/antd.provider";
+
 import "./globals.css";
 
 export const metadata: Metadata = {
@@ -14,7 +16,9 @@ type Props = PropsWithChildren;
 export default function RootLayout({ children }: Props): ReactNode {
   return (
     <html lang="en">
-      <body>{children}</body>
+      <body>
+        <AntdProvider>{children}</AntdProvider>
+      </body>
     </html>
   );
 }

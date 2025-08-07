@@ -5,6 +5,7 @@
     "^(vite|@vitejs)(/(.*))?$",
     "^(react|react-dom)(/(.*))?$",
     "^next(/(.*))?$",
+    "^(antd|@ant-design)(/(.*))?$",
     "^react-dropzone(/(.*))?$",
     "^@iconify(/(.*))?$",
     "^@iconify-json(/(.*))?$",
