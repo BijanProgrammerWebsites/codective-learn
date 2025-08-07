@@ -1,0 +1,20 @@
+.quiz {
+  inline-size: min(40rem, 100%);
+
+  margin-inline: auto;
+
+  .questions {
+    display: grid;
+    gap: 2rem;
+
+    .question {
+      display: grid;
+      grid-template-columns: auto 1fr;
+      gap: 2rem;
+
+      .number {
+        margin-block: 0;
+      }
+    }
+  }
+}

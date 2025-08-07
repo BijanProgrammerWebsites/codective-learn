@@ -24,6 +24,7 @@
     "^@/mock",
     "^@/models",
     "^@/providers",
+    "^@/questions",
     "^@/types",
     "^@/utils",
     "^@/styles",

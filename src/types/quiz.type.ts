@@ -1,0 +1,25 @@
+import type { ReactNode } from "react";
+
+export type QuizType = {
+  chapters: QuizChapter[];
+  questions: QuestionType[];
+};
+
+export type QuizChapter = {
+  icon: string;
+  title: string;
+};
+
+export type MultipleChoiceQuestionType = {
+  category: "multiple-choice";
+  title: ReactNode;
+  choices: ReactNode[];
+  correctChoiceIndex: number;
+};
+
+export type FillInTheBlankQuestionType = {
+  category: "fill-in-the-blank";
+  title: ReactNode;
+};
+
+type QuestionType = MultipleChoiceQuestionType | FillInTheBlankQuestionType;
