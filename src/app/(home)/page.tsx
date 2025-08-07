@@ -3,6 +3,7 @@
 import { ReactNode } from "react";
 
 import Image from "next/image";
+import Link from "next/link";
 
 import { Card, List } from "antd";
 
@@ -31,7 +32,7 @@ export default function Page(): ReactNode {
   return (
     <div className={styles.page}>
       <div className={styles.quizzes}>
-        <Card title="Quiz 1">
+        <Card title="Quiz 1" extra={<Link href="/q/1">Start</Link>}>
           <List
             itemLayout="horizontal"
             dataSource={items}
