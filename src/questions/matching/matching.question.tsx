@@ -1,6 +1,6 @@
 "use client";
 
-import { ReactNode, useMemo, useState } from "react";
+import { ReactNode, useId, useMemo, useState } from "react";
 
 import { Button, Card, theme } from "antd";
 
@@ -42,6 +42,8 @@ export default function MatchingQuestion({ question }: Props): ReactNode {
   const [validationStatus, setValidationStatus] =
     useState<ValidationStatusType>("idle");
   const [validatedOrder, setValidatedOrder] = useState<string[] | null>(null);
+
+  const dndContextId = useId();
 
   const sensors = useSensors(
     useSensor(PointerSensor, { activationConstraint: { distance: 4 } }),
@@ -102,6 +104,7 @@ export default function MatchingQuestion({ question }: Props): ReactNode {
           </div>
           <div className={styles.list}>
             <DndContext
+              id={`DndDescribedBy-${dndContextId}`}
               sensors={sensors}
               collisionDetection={closestCenter}
               onDragEnd={handleDragEnd}
