@@ -42,5 +42,19 @@ export const quiz1: QuizType = {
         { text: "The <span> element is a block-level element by default.", answer: false },
       ],
     },
+    {
+      category: "matching",
+      title: "Match the pairs",
+      left: [
+        { id: "l1", text: "HTML" },
+        { id: "l2", text: "CSS" },
+        { id: "l3", text: "JavaScript" },
+      ],
+      right: [
+        { id: "l1", text: "Structure" },
+        { id: "l2", text: "Style" },
+        { id: "l3", text: "Interactivity" },
+      ],
+    },
   ],
 };

@@ -36,7 +36,20 @@ export type TrueFalseQuestionType = {
   items: TrueFalseItem[];
 };
 
+export type MatchingPairItem = {
+  id: string;
+  text: ReactNode;
+};
+
+export type MatchingQuestionType = {
+  category: "matching";
+  title: ReactNode;
+  left: MatchingPairItem[];
+  right: MatchingPairItem[];
+};
+
 type QuestionType =
   | MultipleChoiceQuestionType
   | FillInTheBlankQuestionType
-  | TrueFalseQuestionType;
+  | TrueFalseQuestionType
+  | MatchingQuestionType;
