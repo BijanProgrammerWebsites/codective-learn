@@ -1,29 +1,24 @@
 "use client";
 
-import { ReactNode, useId, useMemo, useState } from "react";
+import { ReactNode, useMemo, useState } from "react";
 
 import { Button, Card, theme } from "antd";
 
 import {
-  DndContext,
-  type DragEndEvent,
-  KeyboardSensor,
-  PointerSensor,
-  closestCenter,
-  useSensor,
-  useSensors,
-} from "@dnd-kit/core";
-import {
-  SortableContext,
-  arrayMove,
-  verticalListSortingStrategy,
-} from "@dnd-kit/sortable";
+  type Edge,
+  Handle,
+  type Node,
+  type OnConnect,
+  Position,
+  ReactFlow,
+  addEdge,
+  useEdgesState,
+  useNodesState,
+} from "@xyflow/react";
 
 import { MatchingQuestionType } from "@/types/quiz.type";
 
-import SortableItem from "./sortable-item";
-
-import styles from "./matching.module.css";
+import "@xyflow/react/dist/style.css";
 
 type ValidationStatusType = "idle" | "correct" | "incorrect";
 
@@ -31,121 +26,220 @@ type Props = {
   question: MatchingQuestionType;
 };
 
-export default function MatchingQuestion({ question }: Props): ReactNode {
+function PromptNode({ data }: { data: { label: ReactNode } }): ReactNode {
   const {
-    token: { colorSuccess, colorError },
+    token: {
+      colorBgContainer,
+      colorBorder,
+      colorText,
+      borderRadiusLG,
+      paddingXS,
+    },
   } = theme.useToken();
 
-  const [responsesOrder, setResponsesOrder] = useState<string[]>(
-    question.responses.map((i) => i.id),
+  return (
+    <div
+      style={{
+        position: "relative",
+        background: colorBgContainer,
+        border: `1px solid ${colorBorder}`,
+        borderRadius: borderRadiusLG,
+        color: colorText,
+        padding: `${paddingXS}px ${paddingXS * 2}px`,
+        userSelect: "none",
+        pointerEvents: "auto",
+      }}
+    >
+      {data.label}
+      <Handle
+        type="source"
+        position={Position.Right}
+        id="right"
+        style={{
+          position: "absolute",
+          inset: 0,
+          background: "transparent",
+          border: "none",
+          borderRadius: 0,
+          boxShadow: "none",
+          opacity: 0,
+          pointerEvents: "auto",
+          width: "100%",
+          height: "100%",
+          transform: "none",
+        }}
+      />
+    </div>
   );
+}
+
+function ResponseNode({ data }: { data: { label: ReactNode } }): ReactNode {
+  const {
+    token: {
+      colorBgContainer,
+      colorBorder,
+      colorText,
+      borderRadiusLG,
+      paddingXS,
+    },
+  } = theme.useToken();
+
+  return (
+    <div
+      style={{
+        position: "relative",
+        background: colorBgContainer,
+        border: `1px solid ${colorBorder}`,
+        borderRadius: borderRadiusLG,
+        color: colorText,
+        padding: `${paddingXS}px ${paddingXS * 2}px`,
+        userSelect: "none",
+        pointerEvents: "auto",
+      }}
+    >
+      {data.label}
+      <Handle
+        type="target"
+        position={Position.Left}
+        id="left"
+        style={{
+          position: "absolute",
+          inset: 0,
+          background: "transparent",
+          border: "none",
+          borderRadius: 0,
+          boxShadow: "none",
+          opacity: 0,
+          pointerEvents: "auto",
+          width: "100%",
+          height: "100%",
+          transform: "none",
+        }}
+      />
+    </div>
+  );
+}
+
+export default function MatchingQuestion({ question }: Props): ReactNode {
+  const {
+    token: { colorSuccess, colorError, colorPrimary },
+  } = theme.useToken();
+
   const [validationStatus, setValidationStatus] =
     useState<ValidationStatusType>("idle");
-  const [validatedOrder, setValidatedOrder] = useState<string[] | null>(null);
 
-  const dndContextId = useId();
+  const initialNodes: Node[] = useMemo(() => {
+    const left: Node[] = question.prompts.map((p, i) => ({
+      id: `prompt-${p.id}`,
+      type: "prompt",
+      position: { x: 0, y: i * 80 },
+      data: { label: p.text },
+    }));
+    const right: Node[] = question.responses.map((r, i) => ({
+      id: `response-${r.id}`,
+      type: "response",
+      position: { x: 400, y: i * 80 },
+      data: { label: r.text },
+    }));
+    return [...left, ...right];
+  }, [question.prompts, question.responses]);
 
-  const sensors = useSensors(
-    useSensor(PointerSensor, { activationConstraint: { distance: 4 } }),
-    useSensor(KeyboardSensor),
-  );
+  const [nodes, setNodes, onNodesChange] = useNodesState(initialNodes);
+  const [edges, setEdges, onEdgesChange] = useEdgesState<Edge>([]);
 
-  const responsesById = useMemo(() => {
+  const correctMap = useMemo(() => {
     const map = new Map<string, string>();
-    question.responses.forEach((r) => map.set(r.id, String(r.text)));
+    question.prompts.forEach((p, i) => {
+      map.set(`prompt-${p.id}`, `response-${question.responses[i]?.id ?? ""}`);
+    });
     return map;
-  }, [question.responses]);
+  }, [question.prompts, question.responses]);
 
-  const handleDragEnd = (event: DragEndEvent): void => {
-    const { active, over } = event;
+  const allAnswered = useMemo(() => {
+    const connectedPrompts = new Set(edges.map((e) => e.source));
+    return question.prompts.every((p) =>
+      connectedPrompts.has(`prompt-${p.id}`),
+    );
+  }, [edges, question.prompts]);
 
-    if (!over || active.id === over.id) {
+  const onConnect: OnConnect = (params): void => {
+    if (validationStatus !== "idle") {
       return;
     }
-
-    setResponsesOrder((prev) => {
-      const oldIndex = prev.indexOf(String(active.id));
-      const newIndex = prev.indexOf(String(over.id));
-      return arrayMove(prev, oldIndex, newIndex);
+    // Ensure one-to-one: remove any previous edge that uses source or target
+    setEdges((eds) => {
+      const filtered = eds.filter(
+        (e) => e.source !== params.source && e.target !== params.target,
+      );
+      return addEdge({ ...params, animated: false }, filtered);
     });
   };
 
   const handleSubmit = (): void => {
-    const isCorrect = question.prompts.every((item, index) => {
-      const responseIdAtIndex = responsesOrder[index];
-      return responseIdAtIndex === question.responses[index].id;
-    });
-    setValidatedOrder([...responsesOrder]);
+    if (!allAnswered) {
+      return;
+    }
+    const isCorrect = edges.every((e) => correctMap.get(e.source) === e.target);
     setValidationStatus(isCorrect ? "correct" : "incorrect");
+    // Color edges
+    setEdges((eds) =>
+      eds.map((e) => ({
+        ...e,
+        style: {
+          stroke:
+            correctMap.get(e.source) === e.target ? colorSuccess : colorError,
+          strokeWidth: 2,
+          strokeLinecap: "round",
+        },
+        animated: false,
+      })),
+    );
   };
 
   return (
-    <div className={styles.matching}>
-      <Card
-        title={question.title ?? "Match the Pairs"}
-        extra={
-          <Button
-            color="primary"
-            variant="filled"
-            disabled={validationStatus === "correct"}
-            onClick={handleSubmit}
-          >
-            Check
-          </Button>
-        }
-      >
-        <div className={styles.grid}>
-          <div className={styles.list}>
-            {question.prompts.map((item) => (
-              <div key={item.id} className={styles.cell}>
-                {item.text}
-              </div>
-            ))}
-          </div>
-          <div className={styles.list}>
-            <DndContext
-              id={`DndDescribedBy-${dndContextId}`}
-              sensors={sensors}
-              collisionDetection={closestCenter}
-              onDragEnd={handleDragEnd}
-            >
-              <SortableContext
-                items={responsesOrder}
-                strategy={verticalListSortingStrategy}
-              >
-                {responsesOrder.map((id, index) => {
-                  const isIdle = validationStatus === "idle";
-                  const snapshotId = validatedOrder
-                    ? validatedOrder[index]
-                    : undefined;
-                  const isCorrect =
-                    !isIdle && snapshotId === question.responses[index].id;
-                  const isIncorrect =
-                    !isIdle &&
-                    snapshotId !== undefined &&
-                    snapshotId !== question.responses[index].id;
-
-                  return (
-                    <SortableItem
-                      key={id}
-                      id={id}
-                      text={responsesById.get(id) ?? id}
-                      style={{
-                        borderColor: isCorrect
-                          ? colorSuccess
-                          : isIncorrect
-                            ? colorError
-                            : undefined,
-                      }}
-                      disabled={validationStatus === "correct"}
-                    />
-                  );
-                })}
-              </SortableContext>
-            </DndContext>
-          </div>
-        </div>
-      </Card>
-    </div>
+    <Card
+      title={question.title ?? "Match the Pairs"}
+      extra={
+        <Button
+          color="primary"
+          variant="filled"
+          disabled={!allAnswered || validationStatus === "correct"}
+          onClick={handleSubmit}
+        >
+          Check
+        </Button>
+      }
+      styles={{ body: { padding: 0 } }}
+    >
+      <div style={{ blockSize: 320 }}>
+        <ReactFlow
+          nodes={nodes}
+          edges={edges}
+          nodesDraggable={false}
+          nodesConnectable
+          elementsSelectable={false}
+          panOnDrag={false}
+          panOnScroll={false}
+          zoomOnScroll={false}
+          zoomOnPinch={false}
+          zoomOnDoubleClick={false}
+          fitView
+          onNodesChange={onNodesChange}
+          onEdgesChange={onEdgesChange}
+          onConnect={onConnect}
+          defaultEdgeOptions={{
+            style: {
+              stroke: colorPrimary,
+              strokeWidth: 2,
+              strokeLinecap: "round",
+            },
+          }}
+          nodeTypes={{ prompt: PromptNode, response: ResponseNode }}
+          connectOnClick
+        />
+      </div>
+    </Card>
   );
 }
+
+ 

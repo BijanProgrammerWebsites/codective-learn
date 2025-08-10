@@ -9,7 +9,7 @@ import { Typography } from "antd";
 import { quizzes } from "@/quizzes";
 
 import FillInTheBlankQuestion from "@/questions/fill-in-the-blank/fill-in-the-blank.question";
-import MatchingLinesQuestion from "@/questions/matching-line/matching-lines.question";
+import MatchingQuestion from "@/questions/matching/matching.question";
 import MultipleChoiceQuestion from "@/questions/multiple-choice/multiple-choice.question";
 import TrueFalseQuestion from "@/questions/true-false/true-false.question";
 
@@ -41,7 +41,7 @@ export default function QuizComponent({ id }: Props): ReactNode {
             ) : question.category === "true-false" ? (
               <TrueFalseQuestion question={question} />
             ) : question.category === "matching" ? (
-              <MatchingLinesQuestion question={question} />
+              <MatchingQuestion question={question} />
             ) : (
               <>Something went wrong!</>
             )}
