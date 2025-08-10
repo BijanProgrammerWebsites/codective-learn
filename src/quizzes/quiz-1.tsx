@@ -26,5 +26,12 @@ export const quiz1: QuizType = {
       choices: ["text", "number", "string", "tel"],
       correctChoiceIndex: 2,
     },
+    {
+      category: "fill-in-the-blank",
+      title: "Fill in the blank",
+      textBefore: "The HTML element used to create a hyperlink is ",
+      textAfter: ".",
+      correctAnswers: ["a", "anchor", "<a>", "<a></a>"],
+    },
   ],
 };

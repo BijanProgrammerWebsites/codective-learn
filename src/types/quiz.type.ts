@@ -20,6 +20,9 @@ export type MultipleChoiceQuestionType = {
 export type FillInTheBlankQuestionType = {
   category: "fill-in-the-blank";
   title: ReactNode;
+  textBefore: ReactNode;
+  textAfter: ReactNode;
+  correctAnswers: string[];
 };
 
 type QuestionType = MultipleChoiceQuestionType | FillInTheBlankQuestionType;

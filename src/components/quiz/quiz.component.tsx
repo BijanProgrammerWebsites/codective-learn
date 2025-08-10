@@ -9,6 +9,7 @@ import { Typography } from "antd";
 import { quizzes } from "@/quizzes";
 
 import MultipleChoiceQuestion from "@/questions/multiple-choice/multiple-choice.question";
+import FillInTheBlankQuestion from "@/questions/fill-in-the-blank/fill-in-the-blank.question";
 
 import styles from "./quiz.module.css";
 
@@ -33,6 +34,8 @@ export default function QuizComponent({ id }: Props): ReactNode {
             </Typography.Title>
             {question.category === "multiple-choice" ? (
               <MultipleChoiceQuestion question={question} />
+            ) : question.category === "fill-in-the-blank" ? (
+              <FillInTheBlankQuestion question={question} />
             ) : (
               <>Something went wrong!</>
             )}

@@ -1,0 +1,22 @@
+.fill-in-the-blank {
+  .inline {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    flex-wrap: wrap;
+  }
+
+  .text {
+    white-space: pre-wrap;
+  }
+
+  .blank {
+    inline-size: min(14rem, 100%);
+  }
+
+  .check {
+    margin-inline-start: auto;
+  }
+}
+
+
