@@ -45,12 +45,12 @@ export const quiz1: QuizType = {
     {
       category: "matching",
       title: "Match the pairs",
-      left: [
+      prompts: [
         { id: "l1", text: "HTML" },
         { id: "l2", text: "CSS" },
         { id: "l3", text: "JavaScript" },
       ],
-      right: [
+      responses: [
         { id: "l1", text: "Structure" },
         { id: "l2", text: "Style" },
         { id: "l3", text: "Interactivity" },

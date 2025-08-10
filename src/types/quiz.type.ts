@@ -44,8 +44,8 @@ export type MatchingPairItem = {
 export type MatchingQuestionType = {
   category: "matching";
   title: ReactNode;
-  left: MatchingPairItem[];
-  right: MatchingPairItem[];
+  prompts: MatchingPairItem[];
+  responses: MatchingPairItem[];
 };
 
 type QuestionType =

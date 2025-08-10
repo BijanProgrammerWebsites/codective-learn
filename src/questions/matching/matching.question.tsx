@@ -33,8 +33,8 @@ export default function MatchingQuestion({ question }: Props): ReactNode {
     token: { colorSuccess, colorError },
   } = theme.useToken();
 
-  const [rightOrder, setRightOrder] = useState<string[]>(
-    question.right.map((i) => i.id),
+  const [responsesOrder, setResponsesOrder] = useState<string[]>(
+    question.responses.map((i) => i.id),
   );
   const [validationStatus, setValidationStatus] =
     useState<ValidationStatusType>("idle");
@@ -45,30 +45,30 @@ export default function MatchingQuestion({ question }: Props): ReactNode {
     useSensor(KeyboardSensor),
   );
 
-  const rightById = useMemo(() => {
+  const responsesById = useMemo(() => {
     const map = new Map<string, string>();
-    question.right.forEach((r) => map.set(r.id, String(r.text)));
+    question.responses.forEach((r) => map.set(r.id, String(r.text)));
     return map;
-  }, [question.right]);
+  }, [question.responses]);
 
   const handleDragEnd = (event: any): void => {
     const { active, over } = event;
     if (!over || active.id === over.id) return;
-    setRightOrder((prev) => {
+    setResponsesOrder((prev) => {
       const oldIndex = prev.indexOf(active.id);
       const newIndex = prev.indexOf(over.id);
       return arrayMove(prev, oldIndex, newIndex);
     });
   };
 
-  const isAllPlaced = rightOrder.length === question.right.length;
+  const isAllPlaced = responsesOrder.length === question.responses.length;
 
   const handleSubmit = (): void => {
-    const isCorrect = question.left.every((item, index) => {
-      const rightIdAtIndex = rightOrder[index];
-      return rightIdAtIndex === question.right[index].id;
+    const isCorrect = question.prompts.every((item, index) => {
+      const responseIdAtIndex = responsesOrder[index];
+      return responseIdAtIndex === question.responses[index].id;
     });
-    setValidatedOrder([...rightOrder]);
+    setValidatedOrder([...responsesOrder]);
     setValidationStatus(isCorrect ? "correct" : "incorrect");
   };
 
@@ -88,35 +88,35 @@ export default function MatchingQuestion({ question }: Props): ReactNode {
         }
       >
         <div className={styles.grid}>
-          <div className={styles.col}>
-            {question.left.map((item) => (
+          <div className={styles.list}>
+            {question.prompts.map((item) => (
               <div key={item.id} className={styles.cell}>
                 {item.text}
               </div>
             ))}
           </div>
-          <div className={styles.col}>
+          <div className={styles.list}>
             <DndContext
               sensors={sensors}
               collisionDetection={closestCenter}
               onDragEnd={handleDragEnd}
             >
               <SortableContext
-                items={rightOrder}
+                items={responsesOrder}
                 strategy={verticalListSortingStrategy}
               >
-                {rightOrder.map((id, index) => {
+                {responsesOrder.map((id, index) => {
                   const isIdle = validationStatus === "idle";
                   const isCorrect =
-                    !isIdle && validatedOrder && id === question.right[index].id;
+                    !isIdle && validatedOrder && id === question.responses[index].id;
                   const isIncorrect =
-                    !isIdle && validatedOrder && id !== question.right[index].id;
+                    !isIdle && validatedOrder && id !== question.responses[index].id;
 
                   return (
                     <SortableItem
                       key={id}
                       id={id}
-                      text={rightById.get(id) ?? id}
+                      text={responsesById.get(id) ?? id}
                       style={{
                         borderColor: isCorrect
                           ? colorSuccess

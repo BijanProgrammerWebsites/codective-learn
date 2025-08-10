@@ -5,7 +5,7 @@
     gap: 1rem;
   }
 
-  .col {
+  .list {
     display: grid;
     gap: 0.5rem;
   }
