@@ -24,6 +24,9 @@ export default function TrueFalseQuestion({ question }: Props): ReactNode {
   );
   const [validationStatus, setValidationStatus] =
     useState<ValidationStatusType>("idle");
+  const [validatedSelection, setValidatedSelection] = useState<
+    Array<boolean | null>
+  >(question.items.map(() => null));
 
   const handleSelect = (index: number, value: boolean): void => {
     setSelected((prev) => {
@@ -35,12 +38,10 @@ export default function TrueFalseQuestion({ question }: Props): ReactNode {
 
   const handleSubmit = (): void => {
     const allAnswered = selected.every((v) => v !== null);
-    if (!allAnswered) {
-      setValidationStatus("incorrect");
-      return;
-    }
+    if (!allAnswered) return;
 
     const isCorrect = selected.every((v, i) => v === question.items[i].answer);
+    setValidatedSelection(selected);
     setValidationStatus(isCorrect ? "correct" : "incorrect");
   };
 
@@ -52,7 +53,7 @@ export default function TrueFalseQuestion({ question }: Props): ReactNode {
           <Button
             color="primary"
             variant="filled"
-            disabled={validationStatus === "correct"}
+            disabled={selected.some((v) => v === null) || validationStatus === "correct"}
             onClick={handleSubmit}
           >
             Check
@@ -62,19 +63,32 @@ export default function TrueFalseQuestion({ question }: Props): ReactNode {
         <div className={styles.list}>
           {question.items.map((item, index) => {
             const current = selected[index];
-            const showSuccess =
-              validationStatus !== "idle" && item.answer === current;
-            const showError =
-              validationStatus !== "idle" && current !== null && !showSuccess;
+            const snapshot = validatedSelection[index];
+            const isIdle = validationStatus === "idle";
+            const isRowCorrect = !isIdle && snapshot !== null && snapshot === item.answer;
+            const isRowIncorrect =
+              !isIdle && snapshot !== null && snapshot !== item.answer;
+
+            const trueButtonColor = !isIdle && snapshot === true
+              ? item.answer === true
+                ? "green"
+                : "danger"
+              : "primary";
+
+            const falseButtonColor = !isIdle && snapshot === false
+              ? item.answer === false
+                ? "green"
+                : "danger"
+              : "primary";
 
             return (
               <div
                 key={index}
                 className={styles.row}
                 style={{
-                  borderColor: showSuccess
+                  borderColor: isRowCorrect
                     ? colorSuccess
-                    : showError
+                    : isRowIncorrect
                     ? colorError
                     : undefined,
                 }}
@@ -82,18 +96,18 @@ export default function TrueFalseQuestion({ question }: Props): ReactNode {
                 <div className={styles.text}>{item.text}</div>
                 <div className={styles.actions}>
                   <Button
-                    color={current === true ? "primary" : undefined}
-                    variant={current === true ? "solid" : "outlined"}
+                    color={trueButtonColor}
+                    variant={current === true ? "filled" : "text"}
                     onClick={() => handleSelect(index, true)}
-                    disabled={validationStatus === "correct"}
+                    disabled={isRowCorrect && snapshot !== true}
                   >
                     True
                   </Button>
                   <Button
-                    color={current === false ? "primary" : undefined}
-                    variant={current === false ? "solid" : "outlined"}
+                    color={falseButtonColor}
+                    variant={current === false ? "filled" : "text"}
                     onClick={() => handleSelect(index, false)}
-                    disabled={validationStatus === "correct"}
+                    disabled={isRowCorrect && snapshot !== false}
                   >
                     False
                   </Button>
