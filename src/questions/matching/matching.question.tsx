@@ -3,11 +3,13 @@
 import { ReactNode, useMemo, useState } from "react";
 
 import { Button, Card, theme } from "antd";
+
 import {
   DndContext,
-  closestCenter,
+  type DragEndEvent,
   KeyboardSensor,
   PointerSensor,
+  closestCenter,
   useSensor,
   useSensors,
 } from "@dnd-kit/core";
@@ -20,6 +22,7 @@ import {
 import { MatchingQuestionType } from "@/types/quiz.type";
 
 import SortableItem from "./sortable-item";
+
 import styles from "./matching.module.css";
 
 type ValidationStatusType = "idle" | "correct" | "incorrect";
@@ -51,17 +54,19 @@ export default function MatchingQuestion({ question }: Props): ReactNode {
     return map;
   }, [question.responses]);
 
-  const handleDragEnd = (event: any): void => {
+  const handleDragEnd = (event: DragEndEvent): void => {
     const { active, over } = event;
-    if (!over || active.id === over.id) return;
+
+    if (!over || active.id === over.id) {
+      return;
+    }
+
     setResponsesOrder((prev) => {
-      const oldIndex = prev.indexOf(active.id);
-      const newIndex = prev.indexOf(over.id);
+      const oldIndex = prev.indexOf(String(active.id));
+      const newIndex = prev.indexOf(String(over.id));
       return arrayMove(prev, oldIndex, newIndex);
     });
   };
-
-  const isAllPlaced = responsesOrder.length === question.responses.length;
 
   const handleSubmit = (): void => {
     const isCorrect = question.prompts.every((item, index) => {
@@ -75,7 +80,7 @@ export default function MatchingQuestion({ question }: Props): ReactNode {
   return (
     <div className={styles.matching}>
       <Card
-        title={question.title}
+        title={question.title ?? "Match the Pairs"}
         extra={
           <Button
             color="primary"
@@ -107,10 +112,15 @@ export default function MatchingQuestion({ question }: Props): ReactNode {
               >
                 {responsesOrder.map((id, index) => {
                   const isIdle = validationStatus === "idle";
+                  const snapshotId = validatedOrder
+                    ? validatedOrder[index]
+                    : undefined;
                   const isCorrect =
-                    !isIdle && validatedOrder && id === question.responses[index].id;
+                    !isIdle && snapshotId === question.responses[index].id;
                   const isIncorrect =
-                    !isIdle && validatedOrder && id !== question.responses[index].id;
+                    !isIdle &&
+                    snapshotId !== undefined &&
+                    snapshotId !== question.responses[index].id;
 
                   return (
                     <SortableItem
@@ -121,8 +131,8 @@ export default function MatchingQuestion({ question }: Props): ReactNode {
                         borderColor: isCorrect
                           ? colorSuccess
                           : isIncorrect
-                          ? colorError
-                          : undefined,
+                            ? colorError
+                            : undefined,
                       }}
                       disabled={validationStatus === "correct"}
                     />
@@ -136,5 +146,3 @@ export default function MatchingQuestion({ question }: Props): ReactNode {
     </div>
   );
 }
-
-

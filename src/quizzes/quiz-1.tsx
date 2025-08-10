@@ -35,25 +35,29 @@ export const quiz1: QuizType = {
     },
     {
       category: "true-false",
-      title: "True or False",
       items: [
-        { text: "The <div> element is an inline element by default.", answer: false },
+        {
+          text: "The <div> element is an inline element by default.",
+          answer: false,
+        },
         { text: "CSS stands for Cascading Style Sheets.", answer: true },
-        { text: "The <span> element is a block-level element by default.", answer: false },
+        {
+          text: "The <span> element is a block-level element by default.",
+          answer: false,
+        },
       ],
     },
     {
       category: "matching",
-      title: "Match the pairs",
       prompts: [
-        { id: "l1", text: "HTML" },
-        { id: "l2", text: "CSS" },
-        { id: "l3", text: "JavaScript" },
+        { id: "prompt-1", text: "HTML" },
+        { id: "prompt-2", text: "CSS" },
+        { id: "prompt-3", text: "JavaScript" },
       ],
       responses: [
-        { id: "l1", text: "Structure" },
-        { id: "l2", text: "Style" },
-        { id: "l3", text: "Interactivity" },
+        { id: "response-1", text: "Structure" },
+        { id: "response-2", text: "Style" },
+        { id: "response-3", text: "Interactivity" },
       ],
     },
   ],

@@ -38,7 +38,9 @@ export default function TrueFalseQuestion({ question }: Props): ReactNode {
 
   const handleSubmit = (): void => {
     const allAnswered = selected.every((v) => v !== null);
-    if (!allAnswered) return;
+    if (!allAnswered) {
+      return;
+    }
 
     const isCorrect = selected.every((v, i) => v === question.items[i].answer);
     setValidatedSelection(selected);
@@ -48,12 +50,14 @@ export default function TrueFalseQuestion({ question }: Props): ReactNode {
   return (
     <div className={styles["true-false"]}>
       <Card
-        title={question.title}
+        title={question.title ?? "True or False"}
         extra={
           <Button
             color="primary"
             variant="filled"
-            disabled={selected.some((v) => v === null) || validationStatus === "correct"}
+            disabled={
+              selected.some((v) => v === null) || validationStatus === "correct"
+            }
             onClick={handleSubmit}
           >
             Check
@@ -65,21 +69,24 @@ export default function TrueFalseQuestion({ question }: Props): ReactNode {
             const current = selected[index];
             const snapshot = validatedSelection[index];
             const isIdle = validationStatus === "idle";
-            const isRowCorrect = !isIdle && snapshot !== null && snapshot === item.answer;
+            const isRowCorrect =
+              !isIdle && snapshot !== null && snapshot === item.answer;
             const isRowIncorrect =
               !isIdle && snapshot !== null && snapshot !== item.answer;
 
-            const trueButtonColor = !isIdle && snapshot === true
-              ? item.answer === true
-                ? "green"
-                : "danger"
-              : "primary";
+            const trueButtonColor =
+              !isIdle && snapshot === true
+                ? item.answer === true
+                  ? "green"
+                  : "danger"
+                : "primary";
 
-            const falseButtonColor = !isIdle && snapshot === false
-              ? item.answer === false
-                ? "green"
-                : "danger"
-              : "primary";
+            const falseButtonColor =
+              !isIdle && snapshot === false
+                ? item.answer === false
+                  ? "green"
+                  : "danger"
+                : "primary";
 
             return (
               <div
@@ -89,8 +96,8 @@ export default function TrueFalseQuestion({ question }: Props): ReactNode {
                   borderColor: isRowCorrect
                     ? colorSuccess
                     : isRowIncorrect
-                    ? colorError
-                    : undefined,
+                      ? colorError
+                      : undefined,
                 }}
               >
                 <div className={styles.text}>{item.text}</div>
@@ -120,5 +127,3 @@ export default function TrueFalseQuestion({ question }: Props): ReactNode {
     </div>
   );
 }
-
-

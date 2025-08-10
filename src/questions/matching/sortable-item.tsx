@@ -3,6 +3,7 @@
 import { CSSProperties, ReactNode } from "react";
 
 import { theme } from "antd";
+
 import { useSortable } from "@dnd-kit/sortable";
 import { CSS } from "@dnd-kit/utilities";
 
@@ -15,7 +16,12 @@ type Props = {
   disabled?: boolean;
 };
 
-export default function SortableItem({ id, text, style, disabled }: Props) {
+export default function SortableItem({
+  id,
+  text,
+  style,
+  disabled,
+}: Props): ReactNode {
   const {
     attributes,
     listeners,
@@ -38,10 +44,14 @@ export default function SortableItem({ id, text, style, disabled }: Props) {
   };
 
   return (
-    <div ref={setNodeRef} style={finalStyle} className={styles.cell} {...attributes} {...listeners}>
+    <div
+      ref={setNodeRef}
+      style={finalStyle}
+      className={styles.cell}
+      {...attributes}
+      {...listeners}
+    >
       {text}
     </div>
   );
 }
-
-

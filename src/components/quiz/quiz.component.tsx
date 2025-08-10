@@ -8,10 +8,10 @@ import { Typography } from "antd";
 
 import { quizzes } from "@/quizzes";
 
+import FillInTheBlankQuestion from "@/questions/fill-in-the-blank/fill-in-the-blank.question";
+import MatchingQuestion from "@/questions/matching/matching.question";
 import MultipleChoiceQuestion from "@/questions/multiple-choice/multiple-choice.question";
 import TrueFalseQuestion from "@/questions/true-false/true-false.question";
-import MatchingQuestion from "@/questions/matching/matching.question";
-import FillInTheBlankQuestion from "@/questions/fill-in-the-blank/fill-in-the-blank.question";
 
 import styles from "./quiz.module.css";
 

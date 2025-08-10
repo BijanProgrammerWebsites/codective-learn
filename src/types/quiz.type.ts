@@ -25,27 +25,27 @@ export type FillInTheBlankQuestionType = {
   correctAnswers: string[];
 };
 
-export type TrueFalseItem = {
+export type TrueFalseQuestionItemType = {
   text: ReactNode;
   answer: boolean;
 };
 
 export type TrueFalseQuestionType = {
   category: "true-false";
-  title: ReactNode;
-  items: TrueFalseItem[];
+  title?: ReactNode;
+  items: TrueFalseQuestionItemType[];
 };
 
-export type MatchingPairItem = {
+export type MatchingQuestionItemType = {
   id: string;
   text: ReactNode;
 };
 
 export type MatchingQuestionType = {
   category: "matching";
-  title: ReactNode;
-  prompts: MatchingPairItem[];
-  responses: MatchingPairItem[];
+  title?: ReactNode;
+  prompts: MatchingQuestionItemType[];
+  responses: MatchingQuestionItemType[];
 };
 
 type QuestionType =
