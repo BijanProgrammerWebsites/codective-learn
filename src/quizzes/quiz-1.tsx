@@ -29,7 +29,7 @@ export const quiz1: QuizType = {
     {
       category: "fill-in-the-blank",
       title: "Fill in the blank",
-      textBefore: "The HTML element used to create a hyperlink is ",
+      textBefore: "The HTML element used to create a hyperlink is",
       textAfter: ".",
       correctAnswers: ["a", "anchor", "<a>", "<a></a>"],
     },

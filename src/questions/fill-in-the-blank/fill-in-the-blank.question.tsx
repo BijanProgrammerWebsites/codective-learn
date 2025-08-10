@@ -1,56 +1,73 @@
 "use client";
 
-import { ReactNode, useMemo, useState } from "react";
+import { ReactNode, useState } from "react";
 
-import { Button, Card, Input } from "antd";
+import { Button, Card, Input, theme } from "antd";
 
 import { FillInTheBlankQuestionType } from "@/types/quiz.type";
 
 import styles from "./fill-in-the-blank.module.css";
+
+type ValidationStatusType = "idle" | "correct" | "incorrect";
 
 type Props = {
   question: FillInTheBlankQuestionType;
 };
 
 export default function FillInTheBlankQuestion({ question }: Props): ReactNode {
-  const [value, setValue] = useState("");
-  const [isSubmitted, setIsSubmitted] = useState(false);
+  const {
+    token: { colorSuccess, colorError },
+  } = theme.useToken();
 
-  const isCorrect = useMemo(() => {
-    const normalized = value.trim().toLowerCase();
-    return question.correctAnswers.some(
-      (answer) => normalized === answer.trim().toLowerCase(),
-    );
-  }, [value, question.correctAnswers]);
+  const [value, setValue] = useState("");
+  const [validationStatus, setValidationStatus] =
+    useState<ValidationStatusType>("idle");
 
   const handleSubmit = (): void => {
-    setIsSubmitted(true);
+    const normalized = value.trim().toLowerCase();
+
+    const isCorrect = question.correctAnswers.some(
+      (answer) => normalized === answer.trim().toLowerCase(),
+    );
+
+    setValidationStatus(isCorrect ? "correct" : "incorrect");
   };
 
   return (
     <div className={styles["fill-in-the-blank"]}>
-      <Card title={question.title}>
-        <div className={styles.inline}>
-          <span className={styles.text}>{question.textBefore}</span>
-          <Input
-            className={styles.blank}
-            value={value}
-            onChange={(e) => setValue(e.target.value)}
-            status={isSubmitted && !isCorrect ? "error" : undefined}
-          />
-          <span className={styles.text}>{question.textAfter}</span>
+      <Card
+        title={question.title}
+        extra={
           <Button
-            className={styles.check}
-            color={isSubmitted ? (isCorrect ? "green" : "danger") : "primary"}
-            variant={isSubmitted ? "solid" : "filled"}
+            color="primary"
+            variant="filled"
+            disabled={validationStatus === "correct"}
             onClick={handleSubmit}
           >
             Check
           </Button>
+        }
+      >
+        <div className={styles.inline}>
+          <span className={styles.text}>{question.textBefore}</span>
+          <Input
+            className={styles.blank}
+            style={{
+              borderColor:
+                validationStatus === "correct"
+                  ? colorSuccess
+                  : validationStatus === "incorrect"
+                    ? colorError
+                    : undefined,
+            }}
+            status={undefined}
+            readOnly={validationStatus === "correct"}
+            value={value}
+            onChange={(e) => setValue(e.target.value)}
+          />
+          <span className={styles.text}>{question.textAfter}</span>
         </div>
       </Card>
     </div>
   );
 }
-
-
