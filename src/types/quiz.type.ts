@@ -25,4 +25,18 @@ export type FillInTheBlankQuestionType = {
   correctAnswers: string[];
 };
 
-type QuestionType = MultipleChoiceQuestionType | FillInTheBlankQuestionType;
+export type TrueFalseItem = {
+  text: ReactNode;
+  answer: boolean;
+};
+
+export type TrueFalseQuestionType = {
+  category: "true-false";
+  title: ReactNode;
+  items: TrueFalseItem[];
+};
+
+type QuestionType =
+  | MultipleChoiceQuestionType
+  | FillInTheBlankQuestionType
+  | TrueFalseQuestionType;

@@ -29,9 +29,18 @@ export const quiz1: QuizType = {
     {
       category: "fill-in-the-blank",
       title: "Fill in the blank",
-      textBefore: "The HTML element used to create a hyperlink is",
+      textBefore: "The HTML element used to create a hyperlink is ",
       textAfter: ".",
       correctAnswers: ["a", "anchor", "<a>", "<a></a>"],
+    },
+    {
+      category: "true-false",
+      title: "True or False",
+      items: [
+        { text: "The <div> element is an inline element by default.", answer: false },
+        { text: "CSS stands for Cascading Style Sheets.", answer: true },
+        { text: "The <span> element is a block-level element by default.", answer: false },
+      ],
     },
   ],
 };
