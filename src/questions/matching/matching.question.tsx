@@ -4,23 +4,31 @@ import { ReactNode, useCallback, useMemo, useState } from "react";
 
 import { Button, Card, theme } from "antd";
 
-import { type Connection, type Edge, type OnConnect, ReactFlow, addEdge, useEdgesState, useNodesState } from "@xyflow/react";
+import {
+  type Connection,
+  type Edge,
+  type OnConnect,
+  ReactFlow,
+  addEdge,
+  useEdgesState,
+  useNodesState,
+} from "@xyflow/react";
+
+import { useNodesHook } from "@/questions/matching/hooks/use-nodes.hook";
 
 import { MatchingQuestionType } from "@/types/quiz.type";
 
+import NodeComponent from "./components/node/node.component";
+import { CANVAS_BLOCK_SIZE_PX } from "./configs/matching.config";
+import { MatchingContext } from "./context/matching.context";
+
 import "@xyflow/react/dist/style.css";
-import { CANVAS_BLOCK_SIZE_PX } from "./components/layout.constants";
-import { buildInitialNodes } from "./components/build-initial-nodes.util";
-import PromptNode from "./components/prompt-node.component";
-import ResponseNode from "./components/response-node.component";
-import { MatchingConnectContext } from "./components/connect-context";
 
 type ValidationStatusType = "idle" | "correct" | "incorrect";
 
 type Props = {
   question: MatchingQuestionType;
 };
-
 
 export default function MatchingQuestion({ question }: Props): ReactNode {
   const {
@@ -30,7 +38,7 @@ export default function MatchingQuestion({ question }: Props): ReactNode {
   const [validationStatus, setValidationStatus] =
     useState<ValidationStatusType>("idle");
 
-  const initialNodes = useMemo(() => buildInitialNodes(question), [question]);
+  const initialNodes = useNodesHook(question);
 
   const [nodes, setNodes, onNodesChange] = useNodesState(initialNodes);
   const [edges, setEdges, onEdgesChange] = useEdgesState<Edge>([]);
@@ -88,7 +96,9 @@ export default function MatchingQuestion({ question }: Props): ReactNode {
         nextLockedTargets.add(edge.target);
       }
     }
-    const isAllCorrect = edges.every((edge) => correctMap.get(edge.source) === edge.target);
+    const isAllCorrect = edges.every(
+      (edge) => correctMap.get(edge.source) === edge.target,
+    );
 
     setValidationStatus(isAllCorrect ? "correct" : "incorrect");
     setLockedSources(nextLockedSources);
@@ -97,13 +107,19 @@ export default function MatchingQuestion({ question }: Props): ReactNode {
     // Reflect connectability on node data so handles are disabled on locked nodes
     setNodes((prev) =>
       prev.map((node) => {
+        const isSource = node.type === "source";
+
         const isLocked =
-          (node.id.startsWith("prompt-") && nextLockedSources.has(node.id)) ||
-          (node.id.startsWith("response-") && nextLockedTargets.has(node.id));
+          (isSource && nextLockedSources.has(node.id)) ||
+          (!isSource && nextLockedTargets.has(node.id));
+
         return {
           ...node,
-          data: { ...node.data, isConnectable: !isLocked },
-        } as typeof node;
+          data: {
+            ...node.data,
+            isConnectable: !isLocked,
+          },
+        };
       }),
     );
 
@@ -111,7 +127,10 @@ export default function MatchingQuestion({ question }: Props): ReactNode {
       return previousEdges.map((edge) => ({
         ...edge,
         style: {
-          stroke: correctMap.get(edge.source) === edge.target ? colorSuccess : colorError,
+          stroke:
+            correctMap.get(edge.source) === edge.target
+              ? colorSuccess
+              : colorError,
           strokeWidth: 2,
           strokeLinecap: "round",
         },
@@ -147,44 +166,44 @@ export default function MatchingQuestion({ question }: Props): ReactNode {
       }
       styles={{ body: { padding: 0 } }}
     >
-      <MatchingConnectContext.Provider value={{
-        isConnectionAllowed,
-        lockedSources,
-        lockedTargets,
-      }}>
+      <MatchingContext.Provider
+        value={{
+          isConnectionAllowed,
+          lockedSources,
+          lockedTargets,
+        }}
+      >
         <div style={{ blockSize: CANVAS_BLOCK_SIZE_PX }}>
           <ReactFlow
-          nodes={nodes}
-          edges={edges}
-          nodesDraggable={false}
-          nodesConnectable
-          elementsSelectable={false}
-          panOnDrag={false}
-          panOnScroll={false}
-          zoomOnScroll={false}
-          zoomOnPinch={false}
-          zoomOnDoubleClick={false}
-          autoPanOnConnect={false}
-          autoPanOnNodeDrag={false}
-          fitView
-          onNodesChange={onNodesChange}
-          onEdgesChange={onEdgesChange}
-          onConnect={onConnect}
-          defaultEdgeOptions={{
-            style: {
-              stroke: colorPrimary,
-              strokeWidth: 2,
-              strokeLinecap: "round",
-            },
-          }}
-          nodeTypes={{ prompt: PromptNode, response: ResponseNode }}
-          connectOnClick
+            nodes={nodes}
+            edges={edges}
+            nodesDraggable={false}
+            nodesConnectable
+            elementsSelectable={false}
+            panOnDrag={false}
+            panOnScroll={false}
+            zoomOnScroll={false}
+            zoomOnPinch={false}
+            zoomOnDoubleClick={false}
+            autoPanOnConnect={false}
+            autoPanOnNodeDrag={false}
+            fitView
+            onNodesChange={onNodesChange}
+            onEdgesChange={onEdgesChange}
+            onConnect={onConnect}
+            defaultEdgeOptions={{
+              style: {
+                stroke: colorPrimary,
+                strokeWidth: 2,
+                strokeLinecap: "round",
+              },
+            }}
+            nodeTypes={{ prompt: NodeComponent, response: NodeComponent }}
+            connectOnClick
             isValidConnection={isConnectionAllowed}
           />
         </div>
-      </MatchingConnectContext.Provider>
+      </MatchingContext.Provider>
     </Card>
   );
 }
-
- 
