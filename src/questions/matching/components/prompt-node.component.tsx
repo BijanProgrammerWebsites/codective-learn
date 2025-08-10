@@ -7,7 +7,7 @@ import { Handle, Position } from "@xyflow/react";
 
 import { buildFullSizeHandleStyle, buildNodeContainerStyle } from "./node.styles";
 
-type Props = { data: { label: ReactNode } };
+type Props = { data: { label: ReactNode; isConnectable?: boolean } };
 
 export default function PromptNode({ data }: Props): ReactNode {
   const { token } = theme.useToken();
@@ -20,6 +20,7 @@ export default function PromptNode({ data }: Props): ReactNode {
         position={Position.Right}
         id="right"
         style={buildFullSizeHandleStyle()}
+        isConnectable={data.isConnectable !== false}
       />
     </div>
   );

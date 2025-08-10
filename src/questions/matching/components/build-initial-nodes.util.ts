@@ -8,14 +8,14 @@ export function buildInitialNodes(question: MatchingQuestionType): Node[] {
     id: `prompt-${prompt.id}`,
     type: "prompt",
     position: { x: LEFT_COLUMN_X, y: index * NODE_VERTICAL_GAP_PX },
-    data: { label: prompt.text },
+    data: { label: prompt.text, isConnectable: true },
   }));
 
   const responseNodes: Node[] = question.responses.map((response, index) => ({
     id: `response-${response.id}`,
     type: "response",
     position: { x: RIGHT_COLUMN_X, y: index * NODE_VERTICAL_GAP_PX },
-    data: { label: response.text },
+    data: { label: response.text, isConnectable: true },
   }));
 
   return [...promptNodes, ...responseNodes];
