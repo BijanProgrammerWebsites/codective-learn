@@ -27,8 +27,23 @@ type Props = {
 };
 
 function PromptNode({ data }: { data: { label: ReactNode } }): ReactNode {
+  const {
+    token: { colorBgContainer, colorBorder, colorText, borderRadiusLG, paddingXS },
+  } = theme.useToken();
+
   return (
-    <div className="react-flow__node-default" style={{ position: "relative" }}>
+    <div
+      style={{
+        position: "relative",
+        background: colorBgContainer,
+        border: `1px solid ${colorBorder}`,
+        borderRadius: borderRadiusLG,
+        color: colorText,
+        padding: `${paddingXS}px ${paddingXS * 2}px`,
+        userSelect: "none",
+        pointerEvents: "auto",
+      }}
+    >
       {data.label}
       <Handle
         type="source"
@@ -53,8 +68,23 @@ function PromptNode({ data }: { data: { label: ReactNode } }): ReactNode {
 }
 
 function ResponseNode({ data }: { data: { label: ReactNode } }): ReactNode {
+  const {
+    token: { colorBgContainer, colorBorder, colorText, borderRadiusLG, paddingXS },
+  } = theme.useToken();
+
   return (
-    <div className="react-flow__node-default" style={{ position: "relative" }}>
+    <div
+      style={{
+        position: "relative",
+        background: colorBgContainer,
+        border: `1px solid ${colorBorder}`,
+        borderRadius: borderRadiusLG,
+        color: colorText,
+        padding: `${paddingXS}px ${paddingXS * 2}px`,
+        userSelect: "none",
+        pointerEvents: "auto",
+      }}
+    >
       {data.label}
       <Handle
         type="target"
@@ -185,6 +215,13 @@ export default function MatchingLinesQuestion({ question }: Props): ReactNode {
           onNodesChange={onNodesChange}
           onEdgesChange={onEdgesChange}
           onConnect={onConnect}
+          defaultEdgeOptions={{
+            style: {
+              stroke: colorPrimary,
+              strokeWidth: 2,
+              strokeLinecap: "round",
+            },
+          }}
           nodeTypes={{ prompt: PromptNode, response: ResponseNode }}
           connectOnClick
         />
