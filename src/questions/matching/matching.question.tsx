@@ -1,24 +1,18 @@
 "use client";
 
-import { ReactNode, useMemo, useState } from "react";
+import { ReactNode, useCallback, useMemo, useState } from "react";
 
 import { Button, Card, theme } from "antd";
 
-import {
-  type Edge,
-  Handle,
-  type Node,
-  type OnConnect,
-  Position,
-  ReactFlow,
-  addEdge,
-  useEdgesState,
-  useNodesState,
-} from "@xyflow/react";
+import { type Edge, type OnConnect, ReactFlow, addEdge, useEdgesState, useNodesState } from "@xyflow/react";
 
 import { MatchingQuestionType } from "@/types/quiz.type";
 
 import "@xyflow/react/dist/style.css";
+import { CANVAS_BLOCK_SIZE_PX } from "./components/layout.constants";
+import { buildInitialNodes } from "./components/build-initial-nodes.util";
+import PromptNode from "./components/prompt-node.component";
+import ResponseNode from "./components/response-node.component";
 
 type ValidationStatusType = "idle" | "correct" | "incorrect";
 
@@ -26,99 +20,6 @@ type Props = {
   question: MatchingQuestionType;
 };
 
-function PromptNode({ data }: { data: { label: ReactNode } }): ReactNode {
-  const {
-    token: {
-      colorBgContainer,
-      colorBorder,
-      colorText,
-      borderRadiusLG,
-      paddingXS,
-    },
-  } = theme.useToken();
-
-  return (
-    <div
-      style={{
-        position: "relative",
-        background: colorBgContainer,
-        border: `1px solid ${colorBorder}`,
-        borderRadius: borderRadiusLG,
-        color: colorText,
-        padding: `${paddingXS}px ${paddingXS * 2}px`,
-        userSelect: "none",
-        pointerEvents: "auto",
-      }}
-    >
-      {data.label}
-      <Handle
-        type="source"
-        position={Position.Right}
-        id="right"
-        style={{
-          position: "absolute",
-          inset: 0,
-          background: "transparent",
-          border: "none",
-          borderRadius: 0,
-          boxShadow: "none",
-          opacity: 0,
-          pointerEvents: "auto",
-          width: "100%",
-          height: "100%",
-          transform: "none",
-        }}
-      />
-    </div>
-  );
-}
-
-function ResponseNode({ data }: { data: { label: ReactNode } }): ReactNode {
-  const {
-    token: {
-      colorBgContainer,
-      colorBorder,
-      colorText,
-      borderRadiusLG,
-      paddingXS,
-    },
-  } = theme.useToken();
-
-  return (
-    <div
-      style={{
-        position: "relative",
-        background: colorBgContainer,
-        border: `1px solid ${colorBorder}`,
-        borderRadius: borderRadiusLG,
-        color: colorText,
-        padding: `${paddingXS}px ${paddingXS * 2}px`,
-        userSelect: "none",
-        pointerEvents: "auto",
-      }}
-    >
-      {data.label}
-      <Handle
-        type="target"
-        position={Position.Left}
-        id="left"
-        style={{
-          position: "absolute",
-          inset: 0,
-          background: "transparent",
-          border: "none",
-          borderRadius: 0,
-          boxShadow: "none",
-          opacity: 0,
-          pointerEvents: "auto",
-          width: "100%",
-          height: "100%",
-          transform: "none",
-        }}
-      />
-    </div>
-  );
-}
 
 export default function MatchingQuestion({ question }: Props): ReactNode {
   const {
@@ -128,21 +29,7 @@ export default function MatchingQuestion({ question }: Props): ReactNode {
   const [validationStatus, setValidationStatus] =
     useState<ValidationStatusType>("idle");
 
-  const initialNodes: Node[] = useMemo(() => {
-    const left: Node[] = question.prompts.map((p, i) => ({
-      id: `prompt-${p.id}`,
-      type: "prompt",
-      position: { x: 0, y: i * 80 },
-      data: { label: p.text },
-    }));
-    const right: Node[] = question.responses.map((r, i) => ({
-      id: `response-${r.id}`,
-      type: "response",
-      position: { x: 400, y: i * 80 },
-      data: { label: r.text },
-    }));
-    return [...left, ...right];
-  }, [question.prompts, question.responses]);
+  const initialNodes = useMemo(() => buildInitialNodes(question), [question]);
 
   const [nodes, setNodes, onNodesChange] = useNodesState(initialNodes);
   const [edges, setEdges, onEdgesChange] = useEdgesState<Edge>([]);
@@ -162,39 +49,45 @@ export default function MatchingQuestion({ question }: Props): ReactNode {
     );
   }, [edges, question.prompts]);
 
-  const onConnect: OnConnect = (params): void => {
-    if (validationStatus !== "idle") {
-      return;
-    }
-    // Ensure one-to-one: remove any previous edge that uses source or target
-    setEdges((eds) => {
-      const filtered = eds.filter(
-        (e) => e.source !== params.source && e.target !== params.target,
-      );
-      return addEdge({ ...params, animated: false }, filtered);
-    });
-  };
+  const onConnect: OnConnect = useCallback(
+    (params): void => {
+      if (validationStatus !== "idle") {
+        return;
+      }
 
-  const handleSubmit = (): void => {
+      setEdges((previousEdges) => {
+        const filteredEdges = previousEdges.filter((edge) => {
+          return edge.source !== params.source && edge.target !== params.target;
+        });
+        return addEdge({ ...params, animated: false }, filteredEdges);
+      });
+    },
+    [validationStatus, setEdges],
+  );
+
+  const handleSubmit = useCallback((): void => {
     if (!allAnswered) {
       return;
     }
-    const isCorrect = edges.every((e) => correctMap.get(e.source) === e.target);
+
+    const isCorrect = edges.every((edge) => {
+      return correctMap.get(edge.source) === edge.target;
+    });
+
     setValidationStatus(isCorrect ? "correct" : "incorrect");
-    // Color edges
-    setEdges((eds) =>
-      eds.map((e) => ({
-        ...e,
+
+    setEdges((previousEdges) => {
+      return previousEdges.map((edge) => ({
+        ...edge,
         style: {
-          stroke:
-            correctMap.get(e.source) === e.target ? colorSuccess : colorError,
+          stroke: correctMap.get(edge.source) === edge.target ? colorSuccess : colorError,
           strokeWidth: 2,
           strokeLinecap: "round",
         },
         animated: false,
-      })),
-    );
-  };
+      }));
+    });
+  }, [allAnswered, edges, correctMap, colorSuccess, colorError]);
 
   return (
     <Card
@@ -211,7 +104,7 @@ export default function MatchingQuestion({ question }: Props): ReactNode {
       }
       styles={{ body: { padding: 0 } }}
     >
-      <div style={{ blockSize: 320 }}>
+      <div style={{ blockSize: CANVAS_BLOCK_SIZE_PX }}>
         <ReactFlow
           nodes={nodes}
           edges={edges}
