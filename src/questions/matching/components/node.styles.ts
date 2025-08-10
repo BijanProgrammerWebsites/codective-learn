@@ -1,4 +1,5 @@
 import { theme } from "antd";
+import { NODE_INLINE_SIZE_PX } from "./layout.constants";
 
 export function buildNodeContainerStyle(
   token: ReturnType<typeof theme.useToken>["token"],
@@ -10,6 +11,8 @@ export function buildNodeContainerStyle(
     borderRadius: token.borderRadiusLG,
     color: token.colorText,
     padding: `${token.paddingXS}px ${token.paddingXS * 2}px`,
+    inlineSize: NODE_INLINE_SIZE_PX,
+    overflow: "hidden",
     userSelect: "none",
     pointerEvents: "auto",
   };
