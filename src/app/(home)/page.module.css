@@ -1,6 +1,11 @@
 .page {
   .quizzes {
     display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(30rem, 1fr));
+    grid-template-columns: repeat(auto-fill, minmax(20rem, 1fr));
+    gap: 1rem;
+
+    .tag {
+      margin-inline-start: 1rem;
+    }
   }
 }

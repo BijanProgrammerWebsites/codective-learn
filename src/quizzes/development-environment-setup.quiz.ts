@@ -1,28 +1,11 @@
 import { QuizType } from "@/types/quiz.type";
 
-export const quiz1: QuizType = {
-  chapters: [
-    {
-      icon: "/assets/logo/vscode.svg",
-      title: "Development Environment Setup",
-      tag: "development-environment-setup",
-    },
-    {
-      icon: "/assets/logo/javascript.svg",
-      title: "JavaScript as a Programming Language",
-      tag: "javascript-as-a-programming-language",
-    },
-    {
-      icon: "/assets/logo/html.svg",
-      title: "Developing Static Pages - HTML Fundamentals",
-      tag: "developing-static-pages",
-    },
-    {
-      icon: "/assets/logo/css.svg",
-      title: "Developing Static Pages - CSS Fundamentals",
-      tag: "developing-static-pages",
-    },
-  ],
+export const developmentEnvironmentSetupQuiz: QuizType = {
+  chapter: {
+    icon: "/assets/logo/vscode.svg",
+    title: "Development Environment Setup",
+    tag: "development-environment-setup",
+  },
   questions: [
     {
       category: "multiple-choice",

@@ -13,25 +13,6 @@ import { quizzes } from "@/quizzes";
 import styles from "./page.module.css";
 
 export default function Page(): ReactNode {
-  const items = [
-    {
-      icon: "/assets/logo/vscode.svg",
-      title: "Development Environment Setup",
-    },
-    {
-      icon: "/assets/logo/javascript.svg",
-      title: "JavaScript as a Programming Language",
-    },
-    {
-      icon: "/assets/logo/html.svg",
-      title: "Developing Static Pages - HTML Fundamentals",
-    },
-    {
-      icon: "/assets/logo/css.svg",
-      title: "Developing Static Pages - CSS Fundamentals",
-    },
-  ];
-
   return (
     <div className={styles.page}>
       <div className={styles.quizzes}>
@@ -43,7 +24,7 @@ export default function Page(): ReactNode {
           >
             <List
               itemLayout="horizontal"
-              dataSource={quiz.chapters}
+              dataSource={[quiz.chapter]}
               renderItem={(item) => (
                 <List.Item>
                   <List.Item.Meta
@@ -52,8 +33,12 @@ export default function Page(): ReactNode {
                     }
                     title={item.title}
                   />
-                  <a href={`${ROADMAP_URL}/#${item.tag}`} target="_blank">
-                    View in Roadmap
+                  <a
+                    className={styles.tag}
+                    href={`${ROADMAP_URL}/#${item.tag}`}
+                    target="_blank"
+                  >
+                    Roadmap
                   </a>
                 </List.Item>
               )}

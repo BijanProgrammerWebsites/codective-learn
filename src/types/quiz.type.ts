@@ -1,7 +1,7 @@
 import type { ReactNode } from "react";
 
 export type QuizType = {
-  chapters: QuizChapter[];
+  chapter: QuizChapter;
   questions: QuestionType[];
 };
 

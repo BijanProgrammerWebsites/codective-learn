@@ -1,3 +1,11 @@
-import { quiz1 } from "@/quizzes/quiz-1";
+import { cssFundamentalsQuiz } from "@/quizzes/css-fundamentals.quiz";
+import { developmentEnvironmentSetupQuiz } from "@/quizzes/development-environment-setup.quiz";
+import { htmlFundamentalsQuiz } from "@/quizzes/html-fundamentals.quiz";
+import { javascriptAsAProgrammingLanguageQuiz } from "@/quizzes/javascript-as-a-programming-language.quiz";
 
-export const quizzes = [quiz1];
+export const quizzes = [
+  developmentEnvironmentSetupQuiz,
+  javascriptAsAProgrammingLanguageQuiz,
+  htmlFundamentalsQuiz,
+  cssFundamentalsQuiz,
+];
