@@ -8,6 +8,7 @@ export type QuizType = {
 export type QuizChapter = {
   icon: string;
   title: string;
+  tag: string;
 };
 
 export type MultipleChoiceQuestionType = {

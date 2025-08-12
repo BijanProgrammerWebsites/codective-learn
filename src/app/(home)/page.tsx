@@ -7,6 +7,7 @@ import Link from "next/link";
 
 import { Card, List } from "antd";
 
+import { ROADMAP_URL } from "@/constants/url.constants";
 import { quizzes } from "@/quizzes";
 
 import styles from "./page.module.css";
@@ -51,6 +52,9 @@ export default function Page(): ReactNode {
                     }
                     title={item.title}
                   />
+                  <a href={`${ROADMAP_URL}/#${item.tag}`} target="_blank">
+                    View in Roadmap
+                  </a>
                 </List.Item>
               )}
             />
